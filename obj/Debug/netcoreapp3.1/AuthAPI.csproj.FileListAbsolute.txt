@@ -58,3 +58,4 @@ C:\Users\askop\OneDrive\Desktop\AuthAPI\bin\Debug\netcoreapp3.1\runtimes\win\lib
 C:\Users\askop\OneDrive\Desktop\AuthAPI\obj\Debug\netcoreapp3.1\AuthAPI.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\askop\OneDrive\Desktop\AuthAPI\obj\Debug\netcoreapp3.1\AuthAPI.csproj.CopyComplete
 C:\Users\askop\OneDrive\Desktop\AuthAPI\bin\Debug\netcoreapp3.1\Properties\launchSettings.json
+C:\Users\askop\OneDrive\Desktop\AuthAPI\bin\Debug\netcoreapp3.1\Microsoft.AspNetCore.Authentication.Facebook.dll
