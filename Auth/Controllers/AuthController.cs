@@ -5,10 +5,12 @@ using AuthAPI.Helpers;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AuthAPI.Auth.Controllers
@@ -19,15 +21,18 @@ namespace AuthAPI.Auth.Controllers
     {
         private IAuthService _authService;
         private IMapper _mapper;
+        private readonly AppSettings _appSettings;
 
         public AuthController
         (
             IAuthService authService,
-            IMapper mapper
+            IMapper mapper,
+            IOptions<AppSettings> appSettings
         )
         {
             _authService = authService;
             _mapper = mapper;
+            _appSettings = appSettings.Value;
         }
 
         [AllowAnonymous]
@@ -42,13 +47,15 @@ namespace AuthAPI.Auth.Controllers
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
                     Subject = new ClaimsIdentity(new Claim[]
                     {
                     new Claim(ClaimTypes.Name, user.Gd.ToString())
                     }),
-                    Expires = DateTime.UtcNow.AddDays(7)
+                    Expires = DateTime.UtcNow.AddDays(7),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                 };
                 var token = tokenHandler.CreateToken(tokenDescriptor);
                 var tokenString = tokenHandler.WriteToken(token);
@@ -90,6 +97,7 @@ namespace AuthAPI.Auth.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut]
         public async Task<IActionResult> UpdateUser(Guid gd, [FromBody] UpdateModel model)
         {
@@ -110,6 +118,7 @@ namespace AuthAPI.Auth.Controllers
             }
         }
 
+        [Authorize]
         [HttpDelete]
         public async Task<IActionResult> DeleteUser(int id)
         {
@@ -117,6 +126,7 @@ namespace AuthAPI.Auth.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<User>> GetByGd(Guid gd)
         {

@@ -43,9 +43,25 @@ namespace AuthAPI.Auth.Services
             return user;
         }
 
-        public Task<User> Register(User user, string password)
+        public async Task<User> Register(User user, string password)
         {
-            throw new NotImplementedException();
+            // Validation
+            if (string.IsNullOrWhiteSpace(password))
+                throw new AppException("Password is required");
+
+            if (_context.Users.Any(usr => usr.Username == user.Username))
+                throw new AppException("Username \"" + user.Username + "\" is already taken");
+
+            byte[] passwordHash, passwordSalt;
+            CreatePasswordHash(password, out passwordHash, out passwordSalt);
+
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+
+            return user;
         }
 
         public async Task Delete(int id)
